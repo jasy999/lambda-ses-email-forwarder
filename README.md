@@ -15,6 +15,8 @@ This lambda function requires following setup in place after creation.
 1) SES receipt rule to save the incoming message in an S3 bucket
 2) Another SES receipt rule to trigger this lambda function
 
+For steps to create SES setup and reciept rules, follow [SES email forwarder through lambda](https://aws.amazon.com/blogs/messaging-and-targeting/forward-incoming-email-to-an-external-destination/)
+
 ## S3 Bucket Policy
 ```
 {
@@ -33,6 +35,37 @@ This lambda function requires following setup in place after creation.
                     "aws:Referer": "<awsAccountId>"
                 }
             }
+        }
+    ]
+}
+```
+
+## IAM Policy for Lambda
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:CreateLogGroup",
+                "logs:PutLogEvents"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "ses:SendRawEmail"
+            ],
+            "Resource": [
+                "arn:aws:s3:::<bucketName>/*",
+                "arn:aws:ses:<region>:<awsAccountId>:identity/*"
+            ]
         }
     ]
 }
